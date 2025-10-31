@@ -53,7 +53,7 @@ app.post('/ussd', async (req, res) => {
 4. Project Giving
 5. Mountain Experience`;
     } else if (['1', '2', '3', '4', '5'].includes(text)) {
-      // user selected a category, save to DB
+      // user selected a category, ask for amount
       const categories = {
         '1': 'Tithe',
         '2': 'Offering',
@@ -63,15 +63,38 @@ app.post('/ussd', async (req, res) => {
       };
       const selectedCategory = categories[text];
 
-      const givingData = {
-        sessionId,
-        phoneNumber,
-        category: selectedCategory,
-        timestamp: new Date()
-      };
-      await givingCollection.insertOne(givingData);
+      response = `CON Enter amount for ${selectedCategory}:`;
+    } else if (text.includes('*')) {
+      // user has entered category and amount (e.g., "1*500")
+      const parts = text.split('*');
+      const categoryChoice = parts[0];
+      const amount = parts[1];
 
-      response = `END Thank you for your ${selectedCategory}. God bless you!`;
+      // validate amount
+      const amountNum = parseFloat(amount);
+      if (isNaN(amountNum) || amountNum <= 0) {
+        response = `END Invalid amount. Please try again.`;
+      } else {
+        const categories = {
+          '1': 'Tithe',
+          '2': 'Offering',
+          '3': 'Thanksgiving',
+          '4': 'Project Giving',
+          '5': 'Mountain Experience'
+        };
+        const selectedCategory = categories[categoryChoice];
+
+        const givingData = {
+          sessionId,
+          phoneNumber,
+          category: selectedCategory,
+          amount: amountNum,
+          timestamp: new Date()
+        };
+        await givingCollection.insertOne(givingData);
+
+        response = `END Thank you for your ${selectedCategory} of ${amountNum}. God bless you!`;
+      }
     } else {
       // user input something unexpected
       response = `END Invalid input. Please try again.`;
