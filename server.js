@@ -37,7 +37,84 @@ async function connectDB() {
 connectDB();
 
 
-// 4. Your USSD endpoint
+// 4. Homepage endpoint
+app.get('/', (req, res) => {
+  res.send(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Church USSD App</title>
+      <style>
+        body {
+          font-family: Arial, sans-serif;
+          max-width: 800px;
+          margin: 50px auto;
+          padding: 20px;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+        }
+        .container {
+          background: rgba(255, 255, 255, 0.1);
+          padding: 40px;
+          border-radius: 15px;
+          box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        }
+        h1 { margin-top: 0; }
+        .status {
+          background: #10b981;
+          display: inline-block;
+          padding: 8px 16px;
+          border-radius: 20px;
+          font-weight: bold;
+        }
+        .info {
+          background: rgba(255, 255, 255, 0.2);
+          padding: 20px;
+          border-radius: 10px;
+          margin-top: 20px;
+        }
+        ul { list-style: none; padding-left: 0; }
+        li { padding: 8px 0; }
+        li:before { content: "✓ "; color: #10b981; font-weight: bold; }
+        .endpoint {
+          background: rgba(0, 0, 0, 0.3);
+          padding: 10px;
+          border-radius: 5px;
+          font-family: monospace;
+          margin-top: 10px;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <h1>🙏 Church USSD Giving App</h1>
+        <div class="status">✅ Running</div>
+
+        <div class="info">
+          <h2>Features</h2>
+          <ul>
+            <li>Tithe Collection</li>
+            <li>Offering Collection</li>
+            <li>Thanksgiving Giving</li>
+            <li>Project Giving</li>
+            <li>Mountain Experience</li>
+          </ul>
+
+          <h2>USSD Endpoint</h2>
+          <div class="endpoint">POST /ussd</div>
+          <p>Configure this endpoint in your USSD provider (Africa's Talking, Twilio, etc.)</p>
+
+          <h2>Status</h2>
+          <p>Server: <strong>Active</strong></p>
+          <p>Database: <strong>${givingCollection ? 'Connected' : 'Connecting...'}</strong></p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `);
+});
+
+// 5. Your USSD endpoint
 app.post('/ussd', async (req, res) => {
   const { sessionId, serviceCode, phoneNumber, text } = req.body;
 
