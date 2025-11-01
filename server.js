@@ -91,9 +91,16 @@ app.post('/ussd', async (req, res) => {
           amount: amountNum,
           timestamp: new Date()
         };
-        await givingCollection.insertOne(givingData);
 
-        response = `END Thank you for your ${selectedCategory} of ${amountNum}. God bless you!`;
+        // Save to MongoDB if connected
+        if (givingCollection) {
+          await givingCollection.insertOne(givingData);
+          response = `END Thank you for your ${selectedCategory} of ${amountNum}. God bless you!`;
+        } else {
+          // MongoDB not connected - show warning but continue
+          console.log('Would save to DB:', givingData);
+          response = `END Thank you for your ${selectedCategory} of ${amountNum}. God bless you!\n(Note: DB not connected - data not saved)`;
+        }
       }
     } else {
       // user input something unexpected
